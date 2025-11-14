@@ -3,7 +3,7 @@
 
 # 🛡️ COMP 163 – Project 2: Character Abilities Showcase  
 ### **By: [Chris Baring]**  
-*(Replace with your actual name)*
+
 
 ---
 
