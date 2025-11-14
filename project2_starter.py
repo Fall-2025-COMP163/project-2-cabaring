@@ -1,10 +1,14 @@
 """
 COMP 163 - Project 2: Character Abilities Showcase
-Name: [Chris Baring]
-Date: [11/14/25]
+Name: [Your Name Here]
+Date: [Date]
 
-AI Usage: Used ChatGPT to clarify assignment instructions and guide class design, inheritance structure, and method overriding. All code was written, tested, and verified by me.
+AI Usage: Used ChatGPT to clarify assignment instructions and provide guidance on class structure and inheritance. All code and testing were completed and verified by me.
+"""
 
+# ============================================================================
+# PROVIDED BATTLE SYSTEM (DO NOT MODIFY)
+# ============================================================================
 
 class SimpleBattle:
     """
@@ -45,123 +49,167 @@ class SimpleBattle:
             print("🤝 It's a tie!")
 
 # ============================================================================
-# YOUR CLASSES TO IMPLEMENT (6 CLASSES TOTAL)
+# YOUR CLASSES TO IMPLEMENT
 # ============================================================================
-# ----------------------------
-# Weapon Class (Composition)
-# ----------------------------
-class Weapon:
-    def __init__(self, name, damage_bonus):
-        self.name = name
-        self.damage_bonus = damage_bonus
 
-    def display_info(self):
-        return f"Weapon: {self.name} | Bonus Damage: {self.damage_bonus}"
-
-# ----------------------------
-# Character Class (Base)
-# ----------------------------
 class Character:
-    def __init__(self, name, health, strength, magic, weapon=None):
+    """Base class for all characters"""
+    
+    def __init__(self, name, health, strength, magic):
         self.name = name
         self.health = health
         self.strength = strength
         self.magic = magic
-        self.weapon = weapon
-
+    
     def attack(self, target):
-        damage = self.strength + (self.weapon.damage_bonus if self.weapon else 0)
+        damage = self.strength
+        print(f"{self.name} attacks {target.name} for {damage} damage.")
         target.take_damage(damage)
-        return f"{self.name} attacks {target.name} for {damage} damage!"
-
+    
     def take_damage(self, damage):
-        self.health -= damage
-        if self.health < 0:
-            self.health = 0
-        return f"{self.name} takes {damage} damage. New health: {self.health}"
-
+        self.health = max(0, self.health - damage)
+        print(f"{self.name} takes {damage} damage. Health is now {self.health}.")
+    
     def display_stats(self):
-        weapon_info = self.weapon.display_info() if self.weapon else "No weapon"
-        return f"{self.name} | HP: {self.health} | STR: {self.strength} | MAG: {self.magic} | {weapon_info}"
+        print(f"{self.name} | Health: {self.health} | Strength: {self.strength} | Magic: {self.magic}")
 
-# ----------------------------
-# Player Class
-# ----------------------------
+
 class Player(Character):
-    def __init__(self, name, character_class, health, strength, magic, weapon=None):
-        super().__init__(name, health, strength, magic, weapon)
+    """Base class for player characters"""
+    
+    def __init__(self, name, character_class, health, strength, magic):
+        super().__init__(name, health, strength, magic)
         self.character_class = character_class
         self.level = 1
         self.experience = 0
-
+    
     def display_stats(self):
-        base_stats = super().display_stats()
-        return base_stats + f" | Class: {self.character_class} | Level: {self.level} | XP: {self.experience}"
+        super().display_stats()
+        print(f"Class: {self.character_class} | Level: {self.level} | Experience: {self.experience}")
 
-# ----------------------------
-# Warrior Class
-# ----------------------------
+
 class Warrior(Player):
+    """Warrior class - strong physical fighter"""
+    
     def __init__(self, name, weapon=None):
-        super().__init__(name, "Warrior", 120, 15, 5, weapon)
-
+        super().__init__(name, "Warrior", health=120, strength=15, magic=5)
+        self.weapon = weapon
+    
     def attack(self, target):
-        damage = self.strength + (self.weapon.damage_bonus if self.weapon else 0)
+        damage = self.strength + 5  # warrior bonus
+        if self.weapon:
+            damage += self.weapon.damage_bonus
+        print(f"{self.name} swings sword at {target.name} for {damage} damage.")
         target.take_damage(damage)
-        return f"{self.name} slashes {target.name} for {damage} damage!"
-
+    
     def power_strike(self, target):
-        damage = self.strength * 2 + (self.weapon.damage_bonus if self.weapon else 0)
+        damage = self.strength * 2
+        if self.weapon:
+            damage += self.weapon.damage_bonus
+        print(f"{self.name} uses POWER STRIKE on {target.name} for {damage} damage!")
         target.take_damage(damage)
-        return f"{self.name} uses POWER STRIKE on {target.name} for {damage} damage!"
 
-# ----------------------------
-# Mage Class
-# ----------------------------
+
 class Mage(Player):
+    """Mage class - magical spellcaster"""
+    
     def __init__(self, name, weapon=None):
-        super().__init__(name, "Mage", 80, 8, 20, weapon)
-
+        super().__init__(name, "Mage", health=80, strength=8, magic=20)
+        self.weapon = weapon
+    
     def attack(self, target):
-        damage = self.magic + (self.weapon.damage_bonus if self.weapon else 0)
+        damage = self.magic
+        if self.weapon:
+            damage += self.weapon.damage_bonus
+        print(f"{self.name} casts a spell on {target.name} for {damage} damage.")
         target.take_damage(damage)
-        return f"{self.name} casts a spell on {target.name} for {damage} damage!"
-
+    
     def fireball(self, target):
-        damage = self.magic * 3 + (self.weapon.damage_bonus if self.weapon else 0)
+        damage = self.magic * 2
+        if self.weapon:
+            damage += self.weapon.damage_bonus
+        print(f"{self.name} casts FIREBALL on {target.name} for {damage} damage!")
         target.take_damage(damage)
-        return f"{self.name} hurls a FIREBALL at {target.name} for {damage} damage!"
 
-# ----------------------------
-# Rogue Class
-# ----------------------------
+
+import random
+
 class Rogue(Player):
+    """Rogue class - quick and sneaky fighter"""
+    
     def __init__(self, name, weapon=None):
-        super().__init__(name, "Rogue", 90, 12, 10, weapon)
-
+        super().__init__(name, "Rogue", health=90, strength=12, magic=10)
+        self.weapon = weapon
+    
     def attack(self, target):
-        damage = self.strength + (self.weapon.damage_bonus if self.weapon else 0)
+        crit = random.randint(1, 10) <= 3
+        damage = self.strength
+        if self.weapon:
+            damage += self.weapon.damage_bonus
+        if crit:
+            damage *= 2
+            print(f"{self.name} lands a CRITICAL HIT on {target.name} for {damage} damage!")
+        else:
+            print(f"{self.name} attacks {target.name} for {damage} damage.")
         target.take_damage(damage)
-        return f"{self.name} swiftly strikes {target.name} for {damage} damage!"
-
+    
     def sneak_attack(self, target):
-        damage = int(self.strength * 2.5) + (self.weapon.damage_bonus if self.weapon else 0)
+        damage = self.strength * 2
+        if self.weapon:
+            damage += self.weapon.damage_bonus
+        print(f"{self.name} performs SNEAK ATTACK on {target.name} for {damage} damage!")
         target.take_damage(damage)
-        return f"{self.name} performs a SNEAK ATTACK on {target.name} for {damage} damage!"
+
+
+class Weapon:
+    """Weapon class for composition"""
+    
+    def __init__(self, name, damage_bonus):
+        self.name = name
+        self.damage_bonus = damage_bonus
+    
+    def display_info(self):
+        print(f"Weapon: {self.name} | Damage Bonus: {self.damage_bonus}")
+
 
 # ============================================================================
 # MAIN PROGRAM FOR TESTING
 # ============================================================================
+
 if __name__ == "__main__":
     print("=== CHARACTER ABILITIES SHOWCASE ===")
+    
+    # Create weapons
     sword = Weapon("Iron Sword", 15)
     staff = Weapon("Oak Staff", 10)
     dagger = Weapon("Shadow Dagger", 12)
 
+    # Create characters
     warrior = Warrior("Marcus", sword)
     mage = Mage("Aria", staff)
     rogue = Rogue("Shadow", dagger)
 
-    print(warrior.display_stats())
-    print(mage.display_stats())
-    print(rogue.display_stats())
+    # Display stats
+    print("\n📊 Character Stats:")
+    warrior.display_stats()
+    mage.display_stats()
+    rogue.display_stats()
+
+    # Test special abilities
+    print("\n✨ Special Abilities:")
+    warrior.power_strike(rogue)
+    mage.fireball(warrior)
+    rogue.sneak_attack(mage)
+
+    # Test weapons
+    print("\n🗡️ Weapons Info:")
+    sword.display_info()
+    staff.display_info()
+    dagger.display_info()
+
+    # Test battle system
+    print("\n⚔️ Battle System Test:")
+    battle = SimpleBattle(warrior, mage)
+    battle.fight()
+    
+    print("\n✅ Testing complete!")
